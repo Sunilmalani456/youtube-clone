@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .input {
+    @apply outline-none border-[#AE7AFF] border-[1px] p-2 h-[40px] focus-visible:ring-[#AE7AFF] focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-offset-[#AE7AFF];
+  }
+  .button {
+    @apply bg-[#AE7AFF] hover:bg-[#8E63E8] text-white p-2 rounded-md !important;
+  }
+}
