@@ -17,11 +17,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { FaFileUpload } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { loginUser, registerUser } from "@/api/auth.api";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/features/auth.slice";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   fullname: z.string().min(2).max(15),
-  username: z.string().min(2).max(15),
+  username: z
+    .string()
+    .min(4)
+    .refine((value) => !value.includes(" "), {
+      message: "Username must not contain spaces",
+    })
+    .refine((value) => value === value.toLowerCase(), {
+      message: "Username must be all lowercase",
+    }),
   email: z.string().email(),
   password: z.string().min(6).max(15),
   profileImg: z.string().url(),
@@ -29,7 +41,9 @@ const formSchema = z.object({
 });
 
 const SignUp = () => {
-  const [Loading, isLoading] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [Loading, setIsLoading] = useState(false);
   const [selectedCover, setSelectedCover] = useState("");
   const [selectedProfile, setSelectedProfile] = useState("");
   const [profilePic, setProfilePic] = useState(null);
@@ -43,16 +57,46 @@ const SignUp = () => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values) {
+  async function onSubmit(values) {
     // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    // console.log(values);
+    values.profileImg = profilePic;
+    values.coverphoto = coverPic;
+    setIsLoading(true);
+
+    try {
+      const registeredUser = await registerUser(values);
+
+      if (registeredUser) {
+        const loggedInUser = await loginUser({
+          usernameOrEmail: values.email,
+          password: values.password,
+        });
+
+        // console.log(loggedInUser);
+
+        if (loggedInUser) {
+          dispatch(setUser(loggedInUser));
+          navigate("/");
+        }
+
+        setIsLoading(false);
+      }
+      // console.log(registeredUser);
+    } catch (error) {
+      // toast.error(error?.message);
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
   }
   return (
-    <div className="w-full flex flex-col items-center py-10 gap-3 px-4">
+    <div className="w-full flex flex-col items-center py-14 gap-3 px-4">
       <div className="flex gap-1 justify-center items-center">
         <Logo />
-        <span className="font-bold text-sm">Video Play</span>
+        <span className="font-bold text-lg text-[#AE7AFF] underline underline-offset-4 decoration-dashed decoration-[#AE7AFF]">
+          Video Play
+        </span>
       </div>
       <div className="w-full flex flex-col items-center">
         <Form {...form} className="">
@@ -60,6 +104,7 @@ const SignUp = () => {
             onSubmit={form.handleSubmit(onSubmit)}
             className="w-full flex flex-col max-w-xs space-y-3"
           >
+            {/* PROFIE IMAGE AND COVER IMAGE */}
             <div
               className="w-full overflow-clip mb-4 rounded-lg bg-gray-300 text-purple-700 bg-cover bg-center bg-no-repeat items-center"
               style={{
@@ -79,11 +124,11 @@ const SignUp = () => {
                         }}
                       >
                         <label htmlFor="profileImg" className="cursor-pointer">
-                          <div className="bg-[#AE7AFF] flex justify-center items-center rounded-full w-7 h-7 text-center ml-28 mt-[106px] cursor-pointer">
+                          <div className="bg-[#AE7AFF] flex justify-center items-center rounded-full w-6 h-6 text-xs text-center ml-24 mt-[106px] cursor-pointer">
                             <FaFileUpload className="text-white" />
                           </div>
 
-                          <input
+                          <Input
                             type="file"
                             style={{ display: "none" }}
                             id="profileImg"
@@ -93,7 +138,6 @@ const SignUp = () => {
                               setSelectedProfile(
                                 URL.createObjectURL(e.target.files[0])
                               );
-                              console.log(e.target.files[0]);
                               setProfilePic(e.target.files[0]);
                               form.setValue(
                                 "profileImg",
@@ -150,6 +194,8 @@ const SignUp = () => {
                 )}
               />
             </div>
+
+            {/* REST OTHER FIELDS */}
             <FormField
               control={form.control}
               name="fullname"
@@ -209,7 +255,7 @@ const SignUp = () => {
               <p className="self-end text-xs">
                 Already have an Account*
                 <span className="pl-1 text-[#AE7AFF] font-bold underline decoration-dashed">
-                  <Link to="/sign-in">👉 LogIn</Link>
+                  <Link to="/sign-in">👉 Log-In</Link>
                 </span>
               </p>
               <Button
