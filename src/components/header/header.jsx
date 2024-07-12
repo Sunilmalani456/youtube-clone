@@ -1,16 +1,36 @@
 /* eslint-disable no-unused-vars */
+import { LineChart, LogOut, Settings, Users2 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import logo from "../../assets/Logologo.png";
 import { Button } from "../ui/button";
-import { useSelector } from "react-redux";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { useLogout } from "@/hooks/auth.hook";
+import { setUser } from "@/features/auth.slice";
 
 const Header = () => {
+  const dispatch = useDispatch();
   const authStatus = useSelector((state) => state.auth.authStatus);
   const userData = useSelector((state) => state.auth.user);
 
+  const { mutateAsync: logout } = useLogout();
+
+  const handleLogout = async () => {
+    const sessionStatus = await logout();
+    if (sessionStatus) {
+      dispatch(setUser(null));
+    }
+  };
+
   return (
     <div className="w-full z-50 bg-gray-900 flex justify-between items-center px-10 py-3 fixed top-0">
-      <Link to="/" className="">
+      <Link to="/" className="flex gap-1 items-center">
         <img
           src={logo}
           alt="logo"
@@ -18,6 +38,7 @@ const Header = () => {
           height={40}
           width={40}
         />
+        <span className="text-white text-lg font-bold">Vidz</span>
       </Link>
       <div className="w-full max-w-xs">
         <input
@@ -28,40 +49,67 @@ const Header = () => {
       <div className="flex gap-3 items-center">
         {authStatus && userData && (
           <>
-            <Button
-              className="bg-gray-500 hover:bg-slate-400"
-              // onClick={handleLogout}
-            >
-              Logout
-            </Button>
-            <div className="mb-8 mt-auto px-4 sm:mb-0 sm:mt-0 sm:px-0">
-              <Link
-                to={`/channel/${userData?.username}/videos`}
-                className="flex w-full gap-4 text-left sm:items-center"
-              >
-                <img
-                  src={userData.avatar?.url}
-                  alt={userData.username}
-                  className="object-cover h-16 w-16 shrink-0 rounded-full sm:h-12 sm:w-12"
-                />
-                <div className="w-full pt-2 sm:hidden">
-                  <h6 className="font-semibold">{userData.fullName}</h6>
-                  <p className="text-sm text-gray-300">{userData.username}</p>
-                </div>
-              </Link>
+            <div className="flex items-center">
+              <DropdownMenu className="">
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="overflow-hidden rounded-full"
+                  >
+                    <img
+                      src={userData.avatar?.url}
+                      width={36}
+                      height={36}
+                      alt={userData.username}
+                      className="overflow-hidden rounded-full"
+                    />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-full bg-slate-900 space-y-1 text-white border border-slate-700"
+                  align="end"
+                >
+                  {[
+                    {
+                      title: "My Account",
+                      icon: <Users2 className="w-4 h-4" />,
+                      href: `/channel/${userData?.username}/videos`,
+                    },
+                    {
+                      title: "DashBoard",
+                      icon: <LineChart className="w-4 h-4" />,
+                      href: "/dashboard",
+                    },
+                    {
+                      title: "Settings",
+                      icon: <Settings className="w-4 h-4" />,
+                      href: "/settings",
+                    },
+                  ].map((item, index) => (
+                    <DropdownMenuItem
+                      asChild
+                      key={index}
+                      className="flex gap-2 items-center focus:bg-slate-800 focus:text-slate-50 cursor-pointer"
+                    >
+                      <Link to={item.href} className="flex gap-2 items-center">
+                        <span>{item.icon}</span>
+                        {item.title}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+
+                  <DropdownMenuSeparator className="bg-slate-800" />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="flex gap-2 items-center focus:bg-red-500/90 focus:text-slate-50"
+                  >
+                    <LogOut className="w-4 h-4" /> Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </>
-        )}
-
-        {!authStatus && (
-          <Button
-            asChild
-            size={"sm"}
-            variant="outlined"
-            className="text-white border border-[#8E63E8] hover:bg-[#8E63E8]"
-          >
-            <Link to={"/sign-in"}>Log In</Link>
-          </Button>
         )}
       </div>
     </div>

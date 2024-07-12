@@ -50,7 +50,7 @@ const LogIn = () => {
       <div className="flex gap-1 justify-center items-center">
         <Logo />
         <span className="font-bold text-lg text-[#AE7AFF] underline underline-offset-4 decoration-dashed decoration-[#AE7AFF]">
-          Video Play
+          Vidz
         </span>
       </div>
       <form

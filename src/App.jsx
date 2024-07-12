@@ -19,6 +19,29 @@ function App() {
 
           <Route element={<RootLayout />}>
             <Route path="/" element={<Home />} />
+            <Route
+              path="liked-videos"
+              element={<p className="pt-16">Like</p>}
+            />
+            <Route
+              path="channel/:username/videos"
+              element={<p className="pt-16">user</p>}
+            />
+            <Route path="my-studio" element={<p className="pt-16">Studio</p>} />
+            <Route path="history" element={<p className="pt-16">History</p>} />
+            <Route path="tweets" element={<p className="pt-16">Tweets</p>} />
+            <Route
+              path="settings"
+              element={<p className="pt-16">Settings</p>}
+            />
+            <Route
+              path="dashboard"
+              element={<p className="pt-16">DashBoard</p>}
+            />
+            <Route
+              path="subscriptions"
+              element={<p className="pt-16">Subscriptions</p>}
+            />
           </Route>
         </Routes>
       </Router>

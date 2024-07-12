@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { getCurrentUser, loginUser } from "@/api/auth.api";
+import { getCurrentUser, loginUser, logout } from "@/api/auth.api";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 
 export const useLogin = () => {
@@ -19,5 +19,11 @@ export const useCurrentUser = () => {
     queryFn: () => getCurrentUser(),
     staleTime: 1000 * 60 * 1, //mean 1 minute
     retry: 1,
+  });
+};
+
+export const useLogout = () => {
+  return useMutation({
+    mutationFn: () => logout(),
   });
 };

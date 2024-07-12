@@ -36,7 +36,7 @@ const RootLayout = () => {
       {/* MIDDLE SECTION */}
       <div className="flex">
         <LeftSidebar />
-        <section className="flex min-h-screen flex-1 flex-col px-6 pb-6 max-md:pb-14 sm:px-14 bg-red-400">
+        <section className="flex min-h-screen flex-1 flex-col px-6 pb-6 max-md:pb-14 sm:px-14">
           <Outlet />
         </section>
       </div>

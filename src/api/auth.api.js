@@ -97,3 +97,14 @@ export const getCurrentUser = async () => {
     throw error?.response?.data?.error;
   }
 };
+
+export const logout = async () => {
+  try {
+    const { data } = await API.post("/users/logout");
+    toast.success(data?.message);
+    return data;
+  } catch (error) {
+    toast.error(error?.response?.data?.error);
+    throw error?.response?.data?.error;
+  }
+};
